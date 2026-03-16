@@ -19,7 +19,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { execSync, spawn } from "child_process";
 import path from "path";
-import { AgentRunner, parseClaudeOutput } from "./runner";
+import { AgentRunner, parseCliOutput } from "./runner";
 import { buildTaskPrompt, getTask, isTaskUnblocked, hasPendingDecision } from "./prompt-builder";
 import { loadConfig } from "./config";
 import { logger } from "./logger";
@@ -835,7 +835,7 @@ async function main() {
 
   // 7. Load execution config
   const config = loadConfig();
-  const { maxTurns, timeoutMinutes, skipPermissions, allowedTools } = config.execution;
+  const { maxTurns, timeoutMinutes, skipPermissions, allowedTools, cliBackend } = config.execution;
   const maxTaskContinuations = config.execution.maxTaskContinuations ?? 2;
   const useAgentTeams = agentTeams || config.execution.agentTeams;
 
@@ -936,6 +936,7 @@ This is session ${continuationIndex + 1}. Previous session(s) ran out of turns o
       skipPermissions,
       allowedTools,
       agentTeams: useAgentTeams,
+      cliBackend,
       cwd: WORKSPACE_ROOT,
       onSpawned: (pid) => {
         // Update the PID in active-runs immediately after spawn
@@ -950,8 +951,8 @@ This is session ${continuationIndex + 1}. Previous session(s) ran out of turns o
       },
     });
 
-    // Parse cost/usage metadata from Claude Code JSON output
-    const meta = parseClaudeOutput(result.stdout);
+    // Parse cost/usage metadata from CLI JSON output
+    const meta = parseCliOutput(result.stdout, cliBackend);
 
     // Update run entry with final status + cost
     const runs = readActiveRuns();

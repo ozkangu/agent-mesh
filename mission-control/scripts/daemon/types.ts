@@ -1,5 +1,7 @@
 // ─── Daemon Configuration ────────────────────────────────────────────────────
 
+export type CliBackend = "claude" | "github-copilot";
+
 export interface ScheduleEntry {
   enabled: boolean;
   cron: string;
@@ -24,6 +26,8 @@ export interface DaemonConfig {
     allowedTools: string[];
     agentTeams: boolean;
     claudeBinaryPath: string | null;
+    cliBackend: CliBackend;
+    copilotBinaryPath: string | null;
     maxTaskContinuations: number;
   };
   inbox: {
@@ -102,6 +106,7 @@ export interface SpawnOptions {
   skipPermissions: boolean;
   allowedTools?: string[];
   agentTeams?: boolean;
+  cliBackend?: CliBackend;
   cwd: string;
   onSpawned?: (pid: number) => void;
 }

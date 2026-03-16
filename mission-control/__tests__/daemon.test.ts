@@ -332,6 +332,8 @@ describe("daemon types", () => {
         allowedTools: ["Edit", "Write"],
         agentTeams: false,
         claudeBinaryPath: null,
+        cliBackend: "claude",
+        copilotBinaryPath: null,
         maxTaskContinuations: 2,
       },
       inbox: {

@@ -4,7 +4,7 @@ import path from "path";
 import { logger } from "./logger";
 import { loadConfig } from "./config";
 import { validateBinary, buildSafeEnv, scrubCredentials } from "./security";
-import type { SpawnOptions, SpawnResult, ClaudeOutputMeta, ClaudeUsage } from "./types";
+import type { SpawnOptions, SpawnResult, ClaudeOutputMeta, ClaudeUsage, CliBackend } from "./types";
 
 // tree-kill for killing process trees on Windows
 import treeKill from "tree-kill";
@@ -164,6 +164,108 @@ function findClaudeBinary(): ResolvedBinary {
   return { bin: "claude", prefixArgs: [], originalPath: "claude" };
 }
 
+// ─── Copilot Binary Detection ───────────────────────────────────────────────
+
+let cachedCopilotBinary: ResolvedBinary | null = null;
+
+function findCopilotBinary(): ResolvedBinary {
+  if (cachedCopilotBinary) return cachedCopilotBinary;
+
+  // 1. Check config override
+  try {
+    const config = loadConfig();
+    if (config.execution.copilotBinaryPath) {
+      logger.info("runner", `Using configured copilot binary path: ${config.execution.copilotBinaryPath}`);
+      cachedCopilotBinary = {
+        bin: config.execution.copilotBinaryPath,
+        prefixArgs: [],
+        originalPath: config.execution.copilotBinaryPath,
+      };
+      return cachedCopilotBinary;
+    }
+  } catch { /* config load failed, continue with auto-detect */ }
+
+  // 2. Check common install locations (Windows + Unix)
+  const candidates: string[] = [];
+
+  if (process.platform === "win32") {
+    const appData = process.env.APPDATA ?? "";
+    const localAppData = process.env.LOCALAPPDATA ?? "";
+    const userProfile = process.env.USERPROFILE ?? "";
+
+    candidates.push(
+      path.join(appData, "npm", "copilot.cmd"),
+      path.join(appData, "npm", "copilot"),
+      path.join(localAppData, "pnpm", "copilot.cmd"),
+      path.join(localAppData, "pnpm", "copilot"),
+      path.join(userProfile, ".local", "bin", "copilot"),
+      path.join(userProfile, ".local", "bin", "copilot.exe"),
+    );
+  } else {
+    const home = process.env.HOME ?? "";
+    candidates.push(
+      path.join(home, ".local", "bin", "copilot"),
+      path.join(home, ".npm-global", "bin", "copilot"),
+      "/usr/local/bin/copilot",
+      "/usr/bin/copilot",
+    );
+  }
+
+  for (const candidate of candidates) {
+    if (candidate && existsSync(candidate)) {
+      logger.info("runner", `Found copilot at: ${candidate}`);
+
+      if (candidate.endsWith(".cmd")) {
+        const jsEntry = resolveJsFromCmd(candidate);
+        if (jsEntry) {
+          logger.info("runner", `Resolved .cmd shim → ${jsEntry} (via node.exe)`);
+          cachedCopilotBinary = {
+            bin: process.execPath,
+            prefixArgs: [jsEntry],
+            originalPath: candidate,
+          };
+          return cachedCopilotBinary;
+        }
+      }
+
+      cachedCopilotBinary = { bin: candidate, prefixArgs: [], originalPath: candidate };
+      return cachedCopilotBinary;
+    }
+  }
+
+  // 3. Try which/where via execSync
+  try {
+    const cmd = process.platform === "win32" ? "where copilot" : "which copilot";
+    const result = execSync(cmd, { encoding: "utf-8", timeout: 5000 })
+      .trim()
+      .split("\n")[0]
+      .trim();
+    if (result) {
+      logger.info("runner", `Found copilot via PATH: ${result}`);
+
+      if (result.endsWith(".cmd")) {
+        const jsEntry = resolveJsFromCmd(result);
+        if (jsEntry) {
+          logger.info("runner", `Resolved .cmd shim → ${jsEntry} (via node.exe)`);
+          cachedCopilotBinary = {
+            bin: process.execPath,
+            prefixArgs: [jsEntry],
+            originalPath: result,
+          };
+          return cachedCopilotBinary;
+        }
+      }
+
+      cachedCopilotBinary = { bin: result, prefixArgs: [], originalPath: result };
+      return cachedCopilotBinary;
+    }
+  } catch { /* not found in PATH */ }
+
+  // 4. Fallback
+  logger.warn("runner", "Could not auto-detect copilot binary. Set 'copilotBinaryPath' in daemon-config.json or install GitHub Copilot CLI globally");
+  return { bin: "copilot", prefixArgs: [], originalPath: "copilot" };
+}
+
 // ─── Claude Code Output Parser ───────────────────────────────────────────────
 
 /**
@@ -210,6 +312,105 @@ export function parseClaudeOutput(stdout: string): ClaudeOutputMeta {
   }
 }
 
+/**
+ * Parse GitHub Copilot CLI's JSONL stdout into structured metadata.
+ *
+ * Copilot outputs one JSON object per line (JSONL). The final line with
+ * `"type":"result"` contains the session summary including sessionId,
+ * exitCode, and usage stats. Turn count is derived by counting
+ * `assistant.turn_end` events.
+ *
+ * Cost field is null — Copilot uses premium requests, not direct billing.
+ */
+export function parseCopilotOutput(stdout: string): ClaudeOutputMeta {
+  const empty: ClaudeOutputMeta = {
+    totalCostUsd: null,
+    numTurns: null,
+    subtype: null,
+    sessionId: null,
+    isError: false,
+    usage: null,
+  };
+
+  try {
+    const lines = stdout.trim().split("\n").filter(Boolean);
+    let resultLine: Record<string, unknown> | null = null;
+    let turnCount = 0;
+    let hasError = false;
+
+    for (const line of lines) {
+      try {
+        const obj = JSON.parse(line) as Record<string, unknown>;
+        if (obj.type === "result") {
+          resultLine = obj;
+        }
+        if (obj.type === "assistant.turn_end") {
+          turnCount++;
+        }
+        if (obj.type === "session.error" || (obj.type === "result" && obj.exitCode !== 0)) {
+          hasError = true;
+        }
+      } catch {
+        // Skip unparseable lines
+      }
+    }
+
+    if (!resultLine) return { ...empty, numTurns: turnCount || null, isError: hasError };
+
+    const meta: ClaudeOutputMeta = {
+      totalCostUsd: null, // Copilot uses premium requests, not direct cost
+      numTurns: turnCount || null,
+      subtype: resultLine.exitCode === 0 ? "success" : "error_max_turns",
+      sessionId: typeof resultLine.sessionId === "string" ? resultLine.sessionId : null,
+      isError: hasError || resultLine.exitCode !== 0,
+      usage: null,
+    };
+
+    // Parse usage from result line
+    if (resultLine.usage && typeof resultLine.usage === "object") {
+      const u = resultLine.usage as Record<string, unknown>;
+      // Copilot reports totalApiDurationMs and premiumRequests, not token counts.
+      // Map what's available; token counts will be 0.
+      const usage: ClaudeUsage = {
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheReadInputTokens: 0,
+        cacheCreationInputTokens: 0,
+      };
+      meta.usage = usage;
+
+      // Sum outputTokens from assistant.message events for a rough count
+      let totalOutputTokens = 0;
+      for (const line of lines) {
+        try {
+          const obj = JSON.parse(line) as Record<string, unknown>;
+          if (obj.type === "assistant.message") {
+            const data = obj.data as Record<string, unknown>;
+            if (typeof data?.outputTokens === "number") {
+              totalOutputTokens += data.outputTokens;
+            }
+          }
+        } catch { /* skip */ }
+      }
+      usage.outputTokens = totalOutputTokens;
+    }
+
+    return meta;
+  } catch {
+    return empty;
+  }
+}
+
+/**
+ * Unified CLI output parser — dispatches to the correct parser based on backend.
+ */
+export function parseCliOutput(stdout: string, backend: CliBackend = "claude"): ClaudeOutputMeta {
+  if (backend === "github-copilot") {
+    return parseCopilotOutput(stdout);
+  }
+  return parseClaudeOutput(stdout);
+}
+
 // ─── Agent Runner ────────────────────────────────────────────────────────────
 
 export class AgentRunner {
@@ -224,7 +425,8 @@ export class AgentRunner {
    * Returns when the process exits or times out.
    */
   async spawnAgent(opts: SpawnOptions): Promise<SpawnResult & { pid: number }> {
-    const resolved = findClaudeBinary();
+    const backend = opts.cliBackend ?? "claude";
+    const resolved = backend === "github-copilot" ? findCopilotBinary() : findClaudeBinary();
 
     if (!validateBinary(resolved.originalPath)) {
       throw new Error(`Security: binary "${resolved.originalPath}" is not in the allowed list`);
@@ -232,24 +434,39 @@ export class AgentRunner {
 
     // Build args array (NOT string interpolation — prevents shell injection)
     // prefixArgs contains the JS entry point when spawning via node.exe
-    const args: string[] = [
-      ...resolved.prefixArgs,
-      "-p", opts.prompt,
-      "--output-format", "json",
-      "--max-turns", String(opts.maxTurns),
-    ];
+    const args: string[] = [...resolved.prefixArgs];
 
-    if (opts.skipPermissions) {
-      args.push("--dangerously-skip-permissions");
-      logger.security("runner", "Spawning with --dangerously-skip-permissions");
-    } else if (opts.allowedTools && opts.allowedTools.length > 0) {
-      args.push("--allowedTools", ...opts.allowedTools);
-      logger.info("runner", `Allowed tools: ${opts.allowedTools.join(", ")}`);
+    if (backend === "github-copilot") {
+      // Copilot CLI flags
+      args.push("-p", opts.prompt, "--output-format", "json");
+      // Copilot uses --max-autopilot-continues instead of --max-turns
+      args.push("--autopilot", "--max-autopilot-continues", String(opts.maxTurns));
+
+      if (opts.skipPermissions) {
+        args.push("--allow-all");
+        logger.security("runner", "Spawning copilot with --allow-all");
+      } else if (opts.allowedTools && opts.allowedTools.length > 0) {
+        for (const tool of opts.allowedTools) {
+          args.push("--allow-tool", tool);
+        }
+        logger.info("runner", `Copilot allowed tools: ${opts.allowedTools.join(", ")}`);
+      }
+    } else {
+      // Claude Code flags
+      args.push("-p", opts.prompt, "--output-format", "json", "--max-turns", String(opts.maxTurns));
+
+      if (opts.skipPermissions) {
+        args.push("--dangerously-skip-permissions");
+        logger.security("runner", "Spawning with --dangerously-skip-permissions");
+      } else if (opts.allowedTools && opts.allowedTools.length > 0) {
+        args.push("--allowedTools", ...opts.allowedTools);
+        logger.info("runner", `Allowed tools: ${opts.allowedTools.join(", ")}`);
+      }
     }
 
-    const safeEnv = buildSafeEnv({ agentTeams: opts.agentTeams });
+    const safeEnv = buildSafeEnv({ agentTeams: opts.agentTeams, cliBackend: backend });
 
-    logger.debug("runner", `Spawning: ${resolved.bin} ${resolved.prefixArgs.length ? resolved.prefixArgs[0] + " " : ""}-p "<prompt>" --max-turns ${opts.maxTurns}`);
+    logger.debug("runner", `Spawning [${backend}]: ${resolved.bin} ${resolved.prefixArgs.length ? resolved.prefixArgs[0] + " " : ""}-p "<prompt>" ${backend === "github-copilot" ? `--autopilot --max-autopilot-continues ${opts.maxTurns}` : `--max-turns ${opts.maxTurns}`}`);
     logger.debug("runner", `CWD: ${opts.cwd || this.cwd}`);
 
     return new Promise<SpawnResult & { pid: number }>((resolve) => {
@@ -336,9 +553,13 @@ export class AgentRunner {
 
         const binPath = resolved.originalPath;
         if (err.message.includes("ENOENT")) {
-          logger.error("runner", `Claude binary not found (${binPath}). Set "claudeBinaryPath" in daemon-config.json or install Claude Code globally: npm i -g @anthropic-ai/claude-code`);
-          // Clear cached path so next attempt retries detection
-          cachedBinary = null;
+          if (backend === "github-copilot") {
+            logger.error("runner", `Copilot binary not found (${binPath}). Set "copilotBinaryPath" in daemon-config.json or install GitHub Copilot CLI globally`);
+            cachedCopilotBinary = null;
+          } else {
+            logger.error("runner", `Claude binary not found (${binPath}). Set "claudeBinaryPath" in daemon-config.json or install Claude Code globally: npm i -g @anthropic-ai/claude-code`);
+            cachedBinary = null;
+          }
         } else {
           logger.error("runner", `Spawn error: ${err.message}`);
         }
@@ -347,7 +568,9 @@ export class AgentRunner {
           exitCode: 1,
           stdout: "",
           stderr: err.message.includes("ENOENT")
-            ? `Claude binary not found. Install Claude Code (npm i -g @anthropic-ai/claude-code) or set "claudeBinaryPath" in Daemon config.`
+            ? backend === "github-copilot"
+              ? `Copilot binary not found. Install GitHub Copilot CLI or set "copilotBinaryPath" in Daemon config.`
+              : `Claude binary not found. Install Claude Code (npm i -g @anthropic-ai/claude-code) or set "claudeBinaryPath" in Daemon config.`
             : scrubCredentials(err.message),
           timedOut: false,
         });

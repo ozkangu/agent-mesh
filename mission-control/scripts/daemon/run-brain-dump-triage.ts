@@ -206,7 +206,7 @@ async function main() {
 
   // 2. Load execution config
   const config = loadConfig();
-  const { maxTurns, timeoutMinutes, skipPermissions, allowedTools } = config.execution;
+  const { maxTurns, timeoutMinutes, skipPermissions, allowedTools, cliBackend } = config.execution;
 
   // 3. Build prompt
   const prompt = buildTriagePrompt(entries);
@@ -220,6 +220,7 @@ async function main() {
       timeoutMinutes: Math.min(timeoutMinutes, 10), // Cap at 10 minutes
       skipPermissions,
       allowedTools,
+      cliBackend,
       cwd: WORKSPACE_ROOT,
     });
 

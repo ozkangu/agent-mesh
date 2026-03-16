@@ -17,6 +17,11 @@
       "cron": "0 9 * * 1-5",
       "command": "standup"
     },
+    "brainDumpTriage": {
+      "enabled": false,
+      "cron": "0 12 * * *",
+      "command": "daily-plan"
+    },
     "weeklyReview": {
       "enabled": true,
       "cron": "0 17 * * 5",
@@ -41,6 +46,8 @@
     ],
     "agentTeams": false,
     "claudeBinaryPath": null,
+    "cliBackend": "claude",
+    "copilotBinaryPath": null,
     "maxTaskContinuations": 2
   },
   "inbox": {

@@ -68,6 +68,7 @@ export default function LaunchPage() {
   const [timeoutMinutes, setTimeoutMinutes] = useState(30);
   const [retries, setRetries] = useState(1);
   const [pollingInterval, setPollingInterval] = useState(5);
+  const [cliBackend, setCliBackend] = useState<"claude" | "github-copilot">("claude");
 
   function startEditing() {
     setMaxParallelAgents(config.concurrency.maxParallelAgents);
@@ -75,6 +76,7 @@ export default function LaunchPage() {
     setTimeoutMinutes(config.execution.timeoutMinutes);
     setRetries(config.execution.retries);
     setPollingInterval(config.polling.intervalMinutes);
+    setCliBackend(config.execution.cliBackend);
     setEditingConfig(true);
   }
 
@@ -90,6 +92,8 @@ export default function LaunchPage() {
         allowedTools: config.execution.allowedTools,
         agentTeams: config.execution.agentTeams,
         claudeBinaryPath: config.execution.claudeBinaryPath,
+        cliBackend,
+        copilotBinaryPath: config.execution.copilotBinaryPath,
         maxTaskContinuations: config.execution.maxTaskContinuations,
       },
       polling: { enabled: config.polling.enabled, intervalMinutes: pollingInterval },
@@ -493,7 +497,7 @@ export default function LaunchPage() {
         <CardContent>
           {editingConfig ? (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
                 <div className="space-y-1.5">
                   <p className="text-muted-foreground text-xs">Max Parallel Agents</p>
                   <Input
@@ -549,6 +553,18 @@ export default function LaunchPage() {
                     className="h-8"
                   />
                 </div>
+                <div className="space-y-1.5">
+                  <p className="text-muted-foreground text-xs">CLI Backend</p>
+                  <Select value={cliBackend} onValueChange={(v) => setCliBackend(v as "claude" | "github-copilot")}>
+                    <SelectTrigger className="h-8">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="claude">Claude Code</SelectItem>
+                      <SelectItem value="github-copilot">GitHub Copilot</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="flex items-center justify-end gap-2 pt-2">
                 <Tip content="Discard changes">
@@ -566,7 +582,7 @@ export default function LaunchPage() {
               </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-4 text-sm">
               <div>
                 <p className="text-muted-foreground">Max Parallel Agents</p>
                 <p className="font-bold">{config.concurrency.maxParallelAgents}</p>
@@ -586,6 +602,10 @@ export default function LaunchPage() {
               <div>
                 <p className="text-muted-foreground">Polling Interval</p>
                 <p className="font-bold">{config.polling.intervalMinutes} min</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">CLI Backend</p>
+                <p className="font-bold">{config.execution.cliBackend === "github-copilot" ? "GitHub Copilot" : "Claude Code"}</p>
               </div>
             </div>
           )}

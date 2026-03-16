@@ -2,7 +2,7 @@ import { readFileSync, writeFileSync, renameSync, existsSync } from "fs";
 import { spawn } from "child_process";
 import path from "path";
 import { logger } from "./logger";
-import { AgentRunner, parseClaudeOutput } from "./runner";
+import { AgentRunner, parseCliOutput } from "./runner";
 import { HealthMonitor } from "./health";
 import { buildTaskPrompt, buildScheduledPrompt, getPendingTasks, isTaskUnblocked, hasPendingDecision } from "./prompt-builder";
 import type { DaemonConfig, MissionsFile } from "./types";
@@ -228,13 +228,14 @@ export class Dispatcher {
       // Start tracking the session
       const sessionId = this.health.startSession(agentId, taskId, "task", 0);
 
-      // Spawn the Claude Code process
+      // Spawn the CLI process
       const spawnPromise = this.runner.spawnAgent({
         prompt,
         maxTurns: this.config.execution.maxTurns,
         timeoutMinutes: this.config.execution.timeoutMinutes,
         skipPermissions: this.config.execution.skipPermissions,
         allowedTools: this.config.execution.allowedTools,
+        cliBackend: this.config.execution.cliBackend,
         cwd: "", // Uses runner default (workspace root)
       });
 
@@ -245,8 +246,8 @@ export class Dispatcher {
           this.health.updateSessionPid(sessionId, result.pid);
         }
 
-        // Parse cost/usage from Claude Code output
-        const meta = parseClaudeOutput(result.stdout);
+        // Parse cost/usage from CLI output
+        const meta = parseCliOutput(result.stdout, this.config.execution.cliBackend);
 
         this.health.endSession(
           sessionId,
@@ -482,11 +483,12 @@ export class Dispatcher {
         timeoutMinutes: this.config.execution.timeoutMinutes,
         skipPermissions: this.config.execution.skipPermissions,
         allowedTools: this.config.execution.allowedTools,
+        cliBackend: this.config.execution.cliBackend,
         cwd: "",
       });
 
-      // Parse cost/usage from Claude Code output
-      const meta = parseClaudeOutput(result.stdout);
+      // Parse cost/usage from CLI output
+      const meta = parseCliOutput(result.stdout, this.config.execution.cliBackend);
       this.health.endSession(sessionId, result.exitCode, result.stderr || null, result.timedOut, meta.totalCostUsd, meta.numTurns, meta.usage);
 
       if (result.exitCode === 0) {

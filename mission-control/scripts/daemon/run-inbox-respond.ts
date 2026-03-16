@@ -16,7 +16,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { spawn } from "child_process";
 import path from "path";
-import { AgentRunner, parseClaudeOutput } from "./runner";
+import { AgentRunner, parseCliOutput } from "./runner";
 import { loadConfig } from "./config";
 import { logger } from "./logger";
 import {
@@ -490,7 +490,7 @@ async function main() {
 
   // 3. Load execution config
   const config = loadConfig();
-  const { skipPermissions, allowedTools } = config.execution;
+  const { skipPermissions, allowedTools, cliBackend } = config.execution;
   const { maxContinuations, maxTurnsPerSession, timeoutPerSessionMinutes } = config.inbox;
 
   // 4. Create or load respond-run entry
@@ -579,6 +579,7 @@ async function main() {
       timeoutMinutes: Math.min(config.execution.timeoutMinutes, timeoutPerSessionMinutes),
       skipPermissions,
       allowedTools,
+      cliBackend,
       cwd: WORKSPACE_ROOT,
       onSpawned: (pid) => {
         updateRespondRun(runId, { pid });
@@ -586,7 +587,7 @@ async function main() {
     });
 
     // 9. Parse cost/usage from output
-    const meta = parseClaudeOutput(result.stdout);
+    const meta = parseCliOutput(result.stdout, cliBackend);
     accumulateRunCost(runId, meta.totalCostUsd, meta.numTurns, meta.usage);
 
     // 10. Decide: should we continue?

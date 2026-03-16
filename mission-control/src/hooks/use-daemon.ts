@@ -59,6 +59,8 @@ interface DaemonConfig {
     allowedTools: string[];
     agentTeams: boolean;
     claudeBinaryPath: string | null;
+    cliBackend: "claude" | "github-copilot";
+    copilotBinaryPath: string | null;
     maxTaskContinuations: number;
   };
   inbox: {
@@ -97,7 +99,7 @@ export function useDaemon(): DaemonData {
     polling: { enabled: true, intervalMinutes: 5 },
     concurrency: { maxParallelAgents: 3 },
     schedule: {},
-    execution: { maxTurns: 25, timeoutMinutes: 30, retries: 1, retryDelayMinutes: 5, skipPermissions: false, allowedTools: ["Edit", "Write"], agentTeams: false, claudeBinaryPath: null, maxTaskContinuations: 2 },
+    execution: { maxTurns: 25, timeoutMinutes: 30, retries: 1, retryDelayMinutes: 5, skipPermissions: false, allowedTools: ["Edit", "Write"], agentTeams: false, claudeBinaryPath: null, cliBackend: "claude", copilotBinaryPath: null, maxTaskContinuations: 2 },
     inbox: { maxContinuations: 2, maxTurnsPerSession: 25, timeoutPerSessionMinutes: 15 },
   });
   const [isRunning, setIsRunning] = useState(false);

@@ -337,6 +337,8 @@ export const daemonConfigUpdateSchema = z.object({
     allowedTools: z.array(z.string().min(1).max(100)).max(50),
     agentTeams: z.boolean(),
     claudeBinaryPath: z.string().nullable(),
+    cliBackend: z.enum(["claude", "github-copilot"]).optional(),
+    copilotBinaryPath: z.string().nullable().optional(),
     maxTaskContinuations: z.number().int().min(0).max(5).optional(),
   }).optional(),
   inbox: z.object({

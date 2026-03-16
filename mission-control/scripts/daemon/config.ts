@@ -31,6 +31,8 @@ const DEFAULT_CONFIG: DaemonConfig = {
     allowedTools: ["Edit", "Write"],
     agentTeams: false,
     claudeBinaryPath: null,
+    cliBackend: "claude",
+    copilotBinaryPath: null,
     maxTaskContinuations: 2,
   },
   inbox: {
@@ -111,6 +113,14 @@ function validateConfig(config: unknown): DaemonConfig {
       result.execution.claudeBinaryPath = ex.claudeBinaryPath;
     } else if (ex.claudeBinaryPath === null) {
       result.execution.claudeBinaryPath = null;
+    }
+    if (typeof ex.cliBackend === "string" && (ex.cliBackend === "claude" || ex.cliBackend === "github-copilot")) {
+      result.execution.cliBackend = ex.cliBackend;
+    }
+    if (typeof ex.copilotBinaryPath === "string") {
+      result.execution.copilotBinaryPath = ex.copilotBinaryPath;
+    } else if (ex.copilotBinaryPath === null) {
+      result.execution.copilotBinaryPath = null;
     }
     if (typeof ex.maxTaskContinuations === "number" && ex.maxTaskContinuations >= 0 && ex.maxTaskContinuations <= 5) {
       result.execution.maxTaskContinuations = ex.maxTaskContinuations;

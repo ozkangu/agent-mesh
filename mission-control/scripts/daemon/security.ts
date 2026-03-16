@@ -94,7 +94,7 @@ export function enforcePromptLimit(prompt: string): string {
 
 // ─── Spawn Safety ────────────────────────────────────────────────────────────
 
-const ALLOWED_BINARIES = ["claude", "claude.cmd", "claude.exe"];
+const ALLOWED_BINARIES = ["claude", "claude.cmd", "claude.exe", "copilot", "copilot.cmd", "copilot.exe"];
 
 /**
  * Validate that only the Claude binary is being spawned.
@@ -111,7 +111,7 @@ export function validateBinary(binary: string): boolean {
  * SystemRoot/WINDIR/COMSPEC/PATHEXT (required for node.exe).
  * Strips all other env vars to prevent credential leakage.
  */
-export function buildSafeEnv(opts?: { agentTeams?: boolean }): Record<string, string> {
+export function buildSafeEnv(opts?: { agentTeams?: boolean; cliBackend?: string }): Record<string, string> {
   const safeEnv: Record<string, string> = {};
 
   // Preserve PATH for binary resolution
@@ -144,6 +144,16 @@ export function buildSafeEnv(opts?: { agentTeams?: boolean }): Record<string, st
   // Agent Teams: experimental multi-agent coordination
   if (opts?.agentTeams) {
     safeEnv.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS = "1";
+  }
+
+  // Copilot CLI: pass through GitHub auth tokens and config paths
+  if (opts?.cliBackend === "github-copilot") {
+    const ghTokenVars = ["GITHUB_TOKEN", "GH_TOKEN", "COPILOT_GITHUB_TOKEN"];
+    for (const v of ghTokenVars) {
+      if (process.env[v]) safeEnv[v] = process.env[v]!;
+    }
+    // XDG config dir for gh CLI auth token resolution
+    if (process.env.XDG_CONFIG_HOME) safeEnv.XDG_CONFIG_HOME = process.env.XDG_CONFIG_HOME;
   }
 
   return safeEnv;
