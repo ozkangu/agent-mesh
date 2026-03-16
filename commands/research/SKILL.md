@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 Research the following topic thoroughly: $ARGUMENTS
 
-1. Read `mission-control/data/ai-context.md` for current project context
+1. Read `agent-mesh/data/ai-context.md` for current project context
 2. Search the web for current information on this topic
 3. Synthesize findings into a structured markdown document
 4. Save the document to `research/` with a descriptive filename

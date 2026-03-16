@@ -1,14 +1,14 @@
 Check for new work assignments and pick up the highest-priority task:
 
-1. Read mission-control/data/ai-context.md for current state
-2. Read mission-control/data/inbox.json — filter for messages where:
+1. Read agent-mesh/data/ai-context.md for current state
+2. Read agent-mesh/data/inbox.json — filter for messages where:
    - `to` matches your current agent role
    - `status` is "unread"
    - `type` is "delegation" (new assignments)
-3. Read mission-control/data/tasks.json — find tasks assigned to your role that are:
+3. Read agent-mesh/data/tasks.json — find tasks assigned to your role that are:
    - kanban "not-started" (ready to work on)
    - Not blocked (no incomplete dependencies in blockedBy)
-4. Read mission-control/data/decisions.json — check for any pending decisions that might affect your work
+4. Read agent-mesh/data/decisions.json — check for any pending decisions that might affect your work
 
 Present findings as:
 

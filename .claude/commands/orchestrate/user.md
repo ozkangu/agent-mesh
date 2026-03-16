@@ -7,10 +7,10 @@ Read the current state of the workspace, identify pending work for each agent, a
 ## Execution Flow
 
 ### Step 1: Situational Awareness
-1. Read `mission-control/data/ai-context.md` for a quick snapshot
-2. Read `mission-control/data/tasks.json` for all tasks
-3. Read `mission-control/data/agents.json` for agent personas
-4. Read `mission-control/data/inbox.json` for pending messages
+1. Read `agent-mesh/data/ai-context.md` for a quick snapshot
+2. Read `agent-mesh/data/tasks.json` for all tasks
+3. Read `agent-mesh/data/agents.json` for agent personas
+4. Read `agent-mesh/data/inbox.json` for pending messages
 
 ### Step 2: Work Assignment
 1. Filter tasks where `kanban` is `"not-started"` or `"in-progress"`
@@ -23,8 +23,8 @@ Read the current state of the workspace, identify pending work for each agent, a
 
 ### Step 3: Sequential Execution (Default Mode)
 For each agent with pending work:
-1. Read the agent's full persona from `mission-control/data/agents.json`
-2. Read the agent's linked skills from `mission-control/data/skills-library.json`
+1. Read the agent's full persona from `agent-mesh/data/agents.json`
+2. Read the agent's linked skills from `agent-mesh/data/skills-library.json`
 3. Read the agent's command file from `.claude/commands/<agent-id>/user.md`
 4. Use the `Task` tool to spawn a sub-agent with that agent's persona
 5. The sub-agent picks up their highest-priority unblocked task
@@ -34,7 +34,7 @@ For each agent with pending work:
    - Posts a completion report to inbox
    - Updates the task's kanban to `"done"` with `completedAt`
    - Logs activity events
-   - Runs `pnpm gen:context` in `mission-control/`
+   - Runs `pnpm gen:context` in `agent-mesh/`
 
 ### Step 4: Multi-Agent Tasks
 For tasks with `collaborators`:
@@ -44,7 +44,7 @@ For tasks with `collaborators`:
 4. Coordination happens through inbox messages between agents
 
 ### Step 5: Wrap-Up
-1. Run `pnpm gen:context` in `mission-control/` to regenerate `ai-context.md`
+1. Run `pnpm gen:context` in `agent-mesh/` to regenerate `ai-context.md`
 2. Report a summary of what was accomplished
 
 ## Parallel Execution Mode

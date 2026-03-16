@@ -1,17 +1,17 @@
 # Solo Entrepreneur Workspace — Agent Operations Manual
 
 ## Quick Start for AI Agents
-- Read `mission-control/data/ai-context.md` FIRST for current state snapshot
-- For full data, read the JSON files in `mission-control/data/`
+- Read `agent-mesh/data/ai-context.md` FIRST for current state snapshot
+- For full data, read the JSON files in `agent-mesh/data/`
 - This workspace is designed for multi-agent operation via Claude Code and Claude Cowork
 - **Communication**: All agent communication happens through JSON files — see Agent Communication Protocol below
 
 ## Workspace Map
 ```
-mission-control/              — Task management + Agent orchestration app (Next.js 15)
-mission-control/data/         — JSON data files (THE source of truth for all data)
-mission-control/scripts/      — Utility scripts (context generation, daemon)
-mission-control/scripts/daemon/ — Autonomous agent daemon (background process)
+agent-mesh/              — Task management + Agent orchestration app (Next.js 15)
+agent-mesh/data/         — JSON data files (THE source of truth for all data)
+agent-mesh/scripts/      — Utility scripts (context generation, daemon)
+agent-mesh/scripts/daemon/ — Autonomous agent daemon (background process)
 projects/                     — Individual project codebases (each has its own CLAUDE.md)
 research/                     — Research notes (markdown)
 docs/                         — Business plans, strategies, analysis
@@ -163,7 +163,7 @@ commands/                     — Plugin commands (Cowork + Claude Code)
 
 ## Agent Registry (Dynamic)
 
-Agents are managed through `mission-control/data/agents.json` and the `/crew` UI. The 5 built-in agents are:
+Agents are managed through `agent-mesh/data/agents.json` and the `/crew` UI. The 5 built-in agents are:
 
 | Role | Handles | Assign when... |
 |------|---------|----------------|
@@ -182,7 +182,7 @@ Tasks support a `collaborators` field alongside `assignedTo` (lead). When collab
 - The orchestrator can spawn sub-agents for each team member
 
 ### Skills Library
-Skills are managed through `mission-control/data/skills-library.json` and the `/skills` UI. Skills contain markdown content that gets injected into agent system prompts when linked. Skill files (`skills/<id>/SKILL.md`) are auto-generated from the library.
+Skills are managed through `agent-mesh/data/skills-library.json` and the `/skills` UI. Skills contain markdown content that gets injected into agent system prompts when linked. Skill files (`skills/<id>/SKILL.md`) are auto-generated from the library.
 
 ## Agent Write Strategy
 
@@ -203,11 +203,11 @@ Skills are managed through `mission-control/data/skills-library.json` and the `/
 
 ## Agent Communication Protocol
 
-Agents communicate through JSON files. The Mission Control UI reads these same files through API routes.
+Agents communicate through JSON files. The Agent Mesh UI reads these same files through API routes.
 
 ### How to Read Your Inbox
 ```
-1. Read mission-control/data/inbox.json
+1. Read agent-mesh/data/inbox.json
 2. Filter messages where `to` matches your role
 3. Filter by `status: "unread"` for new messages
 4. Process delegations (type: "delegation") as new work assignments
@@ -216,7 +216,7 @@ Agents communicate through JSON files. The Mission Control UI reads these same f
 
 ### How to Post a Completion Report
 ```
-1. Read mission-control/data/inbox.json
+1. Read agent-mesh/data/inbox.json
 2. Add a new message:
    {
      "id": "msg_{Date.now()}",
@@ -235,7 +235,7 @@ Agents communicate through JSON files. The Mission Control UI reads these same f
 
 ### How to Log Activity
 ```
-1. Read mission-control/data/activity-log.json
+1. Read agent-mesh/data/activity-log.json
 2. Add a new event:
    {
      "id": "evt_{Date.now()}",
@@ -251,7 +251,7 @@ Agents communicate through JSON files. The Mission Control UI reads these same f
 
 ### How to Request a Decision
 ```
-1. Read mission-control/data/decisions.json
+1. Read agent-mesh/data/decisions.json
 2. Add a new decision:
    {
      "id": "dec_{Date.now()}",
@@ -271,7 +271,7 @@ Agents communicate through JSON files. The Mission Control UI reads these same f
 
 ### How to Update Task Progress
 ```
-1. Read mission-control/data/tasks.json
+1. Read agent-mesh/data/tasks.json
 2. Find the task by ID
 3. Update fields (kanban, subtasks, actualMinutes, etc.)
 4. Always update "updatedAt" to current ISO timestamp
@@ -323,22 +323,22 @@ Agents communicate through JSON files. The Mission Control UI reads these same f
 - Keep entries short; elaboration goes in the task description
 
 ### After Modifying Data Files
-Run `pnpm gen:context` in `mission-control/` to regenerate `ai-context.md`
+Run `pnpm gen:context` in `agent-mesh/` to regenerate `ai-context.md`
 
 ## Tech Stack
 - Node.js LTS + **pnpm** (NOT npm or yarn)
 - Next.js 15 App Router + TypeScript strict + Tailwind CSS v4 + shadcn/ui
 - Local JSON file storage — no external databases
-- Path alias: `@/` maps to `src/` (inside mission-control/)
+- Path alias: `@/` maps to `src/` (inside agent-mesh/)
 
 ## Code Conventions
 - TypeScript strict mode, no `any` types
 - Functional components with hooks
 - `"use client"` only when needed (interactive pages, hooks)
 - Prefer named exports
-- After code changes: `pnpm tsc --noEmit` (in mission-control/)
+- After code changes: `pnpm tsc --noEmit` (in agent-mesh/)
 
-## Commands (run inside mission-control/)
+## Commands (run inside agent-mesh/)
 - Dev: `pnpm dev`
 - Build: `pnpm build`
 - Lint: `pnpm lint`

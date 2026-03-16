@@ -1,12 +1,12 @@
 Generate my daily standup by doing the following:
 
-1. Read mission-control/data/ai-context.md for a quick snapshot of current state
-2. Read mission-control/data/tasks.json and find tasks with kanban "in-progress"
-3. Read mission-control/data/inbox.json for any unread messages
-4. Read mission-control/data/activity-log.json for recent events (last 24 hours)
-5. Read mission-control/data/decisions.json for any pending decisions
+1. Read agent-mesh/data/ai-context.md for a quick snapshot of current state
+2. Read agent-mesh/data/tasks.json and find tasks with kanban "in-progress"
+3. Read agent-mesh/data/inbox.json for any unread messages
+4. Read agent-mesh/data/activity-log.json for recent events (last 24 hours)
+5. Read agent-mesh/data/decisions.json for any pending decisions
 6. Run `git log --oneline --since="yesterday" --all` across all project directories
-7. Read mission-control/data/goals.json to check milestone progress
+7. Read agent-mesh/data/goals.json to check milestone progress
 
 Format the output as:
 

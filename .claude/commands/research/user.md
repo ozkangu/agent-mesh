@@ -2,9 +2,9 @@ Research the following topic thoroughly: $ARGUMENTS
 
 ## Setup
 
-1. Read `mission-control/data/ai-context.md` for current project context and priorities
-2. Read `mission-control/data/projects.json` to understand active projects
-3. Read `mission-control/data/goals.json` to understand strategic goals
+1. Read `agent-mesh/data/ai-context.md` for current project context and priorities
+2. Read `agent-mesh/data/projects.json` to understand active projects
+3. Read `agent-mesh/data/goals.json` to understand strategic goals
 4. Check the `research/` folder for any existing research on this or related topics
 
 ## Research Framework

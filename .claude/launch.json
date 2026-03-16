@@ -2,11 +2,11 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "mission-control",
+      "name": "agent-mesh",
       "runtimeExecutable": "node",
       "runtimeArgs": ["node_modules/next/dist/bin/next", "dev"],
       "port": 3000,
-      "cwd": "mission-control"
+      "cwd": "agent-mesh"
     }
   ]
 }

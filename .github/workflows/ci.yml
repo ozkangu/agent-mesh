@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: mission-control
+        working-directory: agent-mesh
 
     steps:
       - uses: actions/checkout@v4
@@ -24,7 +24,7 @@ jobs:
         with:
           node-version: "22"
           cache: pnpm
-          cache-dependency-path: mission-control/pnpm-lock.yaml
+          cache-dependency-path: agent-mesh/pnpm-lock.yaml
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile

@@ -6,10 +6,10 @@ disable-model-invocation: true
 
 Generate my daily standup by doing the following:
 
-1. Read `mission-control/data/ai-context.md` for a quick snapshot of current state
-2. Read `mission-control/data/tasks.json` and find tasks with kanban `"in-progress"`
+1. Read `agent-mesh/data/ai-context.md` for a quick snapshot of current state
+2. Read `agent-mesh/data/tasks.json` and find tasks with kanban `"in-progress"`
 3. Run `git log --oneline --since="yesterday" --all` across all project directories
-4. Read `mission-control/data/goals.json` to check milestone progress
+4. Read `agent-mesh/data/goals.json` to check milestone progress
 
 Format the output as:
 

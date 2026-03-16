@@ -9,7 +9,7 @@ You are acting as a Research Analyst. Your role is to investigate topics thoroug
 Topic to research: $ARGUMENTS
 
 Steps:
-1. Read `mission-control/data/ai-context.md` for current project context
+1. Read `agent-mesh/data/ai-context.md` for current project context
 2. Search the web for the most current information on this topic
 3. Cross-reference multiple sources for accuracy
 4. Focus on practical, actionable findings

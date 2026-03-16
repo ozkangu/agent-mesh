@@ -3,10 +3,10 @@ You are acting as a Business Analyst and Strategist advising a solo software ent
 Analysis task: $ARGUMENTS
 
 Before starting:
-1. Read mission-control/data/ai-context.md for a quick snapshot of current state
-2. Read mission-control/data/projects.json to understand current projects
-2. Read mission-control/data/goals.json to understand priorities
-3. Read mission-control/data/tasks.json for workload context
+1. Read agent-mesh/data/ai-context.md for a quick snapshot of current state
+2. Read agent-mesh/data/projects.json to understand current projects
+2. Read agent-mesh/data/goals.json to understand priorities
+3. Read agent-mesh/data/tasks.json for workload context
 4. Check docs/ for existing business plans and strategies
 
 Capabilities:

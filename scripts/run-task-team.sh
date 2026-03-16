@@ -16,8 +16,8 @@ fi
 
 TASK_ID="$1"
 WORKSPACE_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-TASKS_FILE="$WORKSPACE_ROOT/mission-control/data/tasks.json"
-AGENTS_FILE="$WORKSPACE_ROOT/mission-control/data/agents.json"
+TASKS_FILE="$WORKSPACE_ROOT/agent-mesh/data/tasks.json"
+AGENTS_FILE="$WORKSPACE_ROOT/agent-mesh/data/agents.json"
 COMMANDS_DIR="$WORKSPACE_ROOT/.claude/commands"
 
 if [ ! -f "$TASKS_FILE" ]; then
@@ -66,7 +66,7 @@ if [ "$FIRST_MEMBER" != "$LEAD" ]; then
   ROLE_DESC="collaborator"
 fi
 
-TASK_PROMPT="You are working on task '$TASK_TITLE' (ID: $TASK_ID) as the $ROLE_DESC. Read mission-control/data/ai-context.md first, then find this task in tasks.json and execute it. Post updates via inbox messages."
+TASK_PROMPT="You are working on task '$TASK_TITLE' (ID: $TASK_ID) as the $ROLE_DESC. Read agent-mesh/data/ai-context.md first, then find this task in tasks.json and execute it. Post updates via inbox messages."
 
 if [ -f "$CMD_FILE" ]; then
   tmux new-session -d -s "$SESSION_NAME" -n "$FIRST_MEMBER" \

@@ -1,6 +1,6 @@
-# Contributing to Mission Control
+# Contributing to Agent Mesh
 
-Thanks for your interest in contributing! Mission Control is an open-source task management system designed for solo entrepreneurs supervising AI agents.
+Thanks for your interest in contributing! Agent Mesh is an open-source task management system designed for solo entrepreneurs supervising AI agents.
 
 ## Getting Started
 
@@ -11,8 +11,8 @@ Thanks for your interest in contributing! Mission Control is an open-source task
 
 ### Setup
 ```bash
-git clone https://github.com/MeisnerDan/mission-control.git
-cd mission-control/mission-control   # repo folder → app folder (where package.json lives)
+git clone https://github.com/ozkangu/agent-mesh.git
+cd agent-mesh/agent-mesh   # repo folder → app folder (where package.json lives)
 pnpm install
 pnpm dev
 ```

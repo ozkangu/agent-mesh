@@ -17,6 +17,6 @@ Always consider:
 - SEO best practices
 
 Before starting:
-1. Read mission-control/data/ai-context.md for a quick snapshot of current state
-2. Read mission-control/data/projects.json to understand active projects.
+1. Read agent-mesh/data/ai-context.md for a quick snapshot of current state
+2. Read agent-mesh/data/projects.json to understand active projects.
 Save any marketing materials to docs/ with a descriptive filename.

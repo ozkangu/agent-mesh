@@ -1,30 +1,30 @@
 <p align="center">
-  <a href="https://github.com/MeisnerDan/mission-control/stargazers"><img src="https://img.shields.io/github/stars/MeisnerDan/mission-control?style=social" alt="GitHub Stars" /></a>&nbsp;
-  <img src="https://img.shields.io/github/license/MeisnerDan/mission-control" alt="License" />&nbsp;
+  <a href="https://github.com/ozkangu/agent-mesh/stargazers"><img src="https://img.shields.io/github/stars/ozkangu/agent-mesh?style=social" alt="GitHub Stars" /></a>&nbsp;
+  <img src="https://img.shields.io/github/license/ozkangu/agent-mesh" alt="License" />&nbsp;
   <img src="https://img.shields.io/badge/version-0.9.1-blue" alt="Version" />&nbsp;
-  <a href="https://github.com/MeisnerDan/mission-control/actions"><img src="https://img.shields.io/github/actions/workflow/status/MeisnerDan/mission-control/ci.yml?label=build" alt="Build Status" /></a>
+  <a href="https://github.com/ozkangu/agent-mesh/actions"><img src="https://img.shields.io/github/actions/workflow/status/ozkangu/agent-mesh/ci.yml?label=build" alt="Build Status" /></a>
 </p>
 
 <p align="center">
-  <img src="mission-control/docs/rocket.svg" alt="Mission Control Rocket" width="80" />
+  <img src="agent-mesh/docs/rocket.svg" alt="Agent Mesh Rocket" width="80" />
 </p>
 
-<h1 align="center">Mission Control</h1>
+<h1 align="center">Agent Mesh</h1>
 
 <p align="center">
   <strong>Open-source task management for the agentic era.</strong><br/>
   The command center for solo entrepreneurs who delegate work to AI agents.
 </p>
 
-<p align="center"><img src="mission-control/docs/demo.gif" alt="Mission Control Demo" width="800" /></p>
+<p align="center"><img src="agent-mesh/docs/demo.gif" alt="Agent Mesh Demo" width="800" /></p>
 
 ---
 
-## Why Mission Control?
+## Why Agent Mesh?
 
 AI coding agents (Claude Code, Cursor, Windsurf) are powerful executors — but managing multiple agents across multiple projects is chaos. There's no shared task board, no inbox, no way to see who's working on what or whether they finished.
 
-**Mission Control gives your AI agents structure.** Agents get roles, inboxes, and reporting protocols. You delegate work through a visual dashboard, they execute and report back. You stay in control without micromanaging.
+**Agent Mesh gives your AI agents structure.** Agents get roles, inboxes, and reporting protocols. You delegate work through a visual dashboard, they execute and report back. You stay in control without micromanaging.
 
 <table>
 <tr>
@@ -52,7 +52,7 @@ Dashboard, inbox, decisions queue. See every agent's workload, read their report
 </tr>
 </table>
 
-> **How is this different from Linear, Asana, or Notion?** Mission Control was built **agent-first**. Agents read and write tasks through a token-optimized API, report progress to your inbox, and ask you for decisions. You manage outcomes, not keystrokes. And it runs locally — no cloud dependency, no API keys, no vendor lock-in.
+> **How is this different from Linear, Asana, or Notion?** Agent Mesh was built **agent-first**. Agents read and write tasks through a token-optimized API, report progress to your inbox, and ask you for decisions. You manage outcomes, not keystrokes. And it runs locally — no cloud dependency, no API keys, no vendor lock-in.
 
 ---
 
@@ -85,12 +85,12 @@ Dashboard, inbox, decisions queue. See every agent's workload, read their report
 - **CI Pipeline** — GitHub Actions runs typecheck, lint, build, and tests on every push and PR
 
 <p align="center">
-  <img src="mission-control/docs/screenshots/eisenhower.png" alt="Eisenhower Priority Matrix" width="400" />
-  <img src="mission-control/docs/screenshots/kanban.png" alt="Kanban Status Board" width="400" />
+  <img src="agent-mesh/docs/screenshots/eisenhower.png" alt="Eisenhower Priority Matrix" width="400" />
+  <img src="agent-mesh/docs/screenshots/kanban.png" alt="Kanban Status Board" width="400" />
 </p>
 <p align="center">
-  <img src="mission-control/docs/screenshots/crew.png" alt="Agent Crew Management" width="400" />
-  <img src="mission-control/docs/screenshots/inbox.png" alt="Agent Inbox" width="400" />
+  <img src="agent-mesh/docs/screenshots/crew.png" alt="Agent Crew Management" width="400" />
+  <img src="agent-mesh/docs/screenshots/inbox.png" alt="Agent Inbox" width="400" />
 </p>
 
 ---
@@ -110,8 +110,8 @@ Dashboard, inbox, decisions queue. See every agent's workload, read their report
 ### Install & Run
 
 ```bash
-git clone https://github.com/MeisnerDan/mission-control.git
-cd mission-control/mission-control   # repo folder → app folder (where package.json lives)
+git clone https://github.com/ozkangu/agent-mesh.git
+cd agent-mesh/agent-mesh   # repo folder → app folder (where package.json lives)
 pnpm install
 pnpm dev
 ```
@@ -130,7 +130,7 @@ Open [http://localhost:3000](http://localhost:3000) and click **"Load Demo Data"
 
 ## How It Works
 
-Mission Control stores all data in local JSON files. No database, no cloud dependency. AI agents interact by reading and writing these files — the same source of truth the web UI uses.
+Agent Mesh stores all data in local JSON files. No database, no cloud dependency. AI agents interact by reading and writing these files — the same source of truth the web UI uses.
 
 ### The Agent Loop
 
@@ -138,7 +138,7 @@ Mission Control stores all data in local JSON files. No database, no cloud depen
 1. You create a task          ──>  Assign to an agent role (e.g., Researcher)
 2. Press play (or daemon)     ──>  Spawns a Claude Code session with agent persona
 3. Agent executes             ──>  Does the work, updates progress
-4. Mission Control completes  ──>  Auto-marks done, posts report, logs activity
+4. Agent Mesh completes  ──>  Auto-marks done, posts report, logs activity
 5. You review                 ──>  Read reports in inbox, answer questions
 ```
 
@@ -146,7 +146,7 @@ Multiple agents can work in parallel across different tasks. **Continuous missio
 
 ### Testing
 
-Mission Control includes **193 automated tests** across 3 suites:
+Agent Mesh includes **193 automated tests** across 3 suites:
 
 ```bash
 pnpm test        # Run all tests
@@ -269,8 +269,8 @@ The daemon runs as a background Node.js process, polling `tasks.json` for pendin
 ## Architecture
 
 ```
-mission-control/              Next.js 15 web app (the visual interface)
-mission-control/data/          JSON data files (the shared source of truth)
+agent-mesh/              Next.js 15 web app (the visual interface)
+agent-mesh/data/          JSON data files (the shared source of truth)
   tasks.json                   Tasks with Eisenhower + Kanban + agent assignment
   goals.json                   Long-term goals and milestones
   projects.json                Projects with team members
@@ -285,8 +285,8 @@ mission-control/data/          JSON data files (the shared source of truth)
   missions.json                Continuous mission state (progress, history, loop detection)
   active-runs.json             Live task execution tracking (status, PIDs, errors)
   respond-runs.json            Inbox auto-respond chain tracking (status, PIDs, cost)
-mission-control/scripts/daemon/ Autonomous agent daemon (node-cron + claude -p)
-mission-control/__tests__/     Automated tests (validation, data, integration, daemon)
+agent-mesh/scripts/daemon/ Autonomous agent daemon (node-cron + claude -p)
+agent-mesh/__tests__/     Automated tests (validation, data, integration, daemon)
 .claude/commands/              Auto-generated slash commands per agent
 scripts/                       Orchestration scripts (tmux parallel agents)
 docs/                          Business plans and strategies
@@ -301,10 +301,10 @@ docs/                          Business plans and strategies
 
 ### Works With
 
-Mission Control runs locally and integrates with AI coding tools through the filesystem and CLI:
+Agent Mesh runs locally and integrates with AI coding tools through the filesystem and CLI:
 
 - **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — Open this workspace in Claude Code to use slash commands (`/orchestrate`, `/daily-plan`, `/standup`, etc.) and let agents read/write task data directly.
-- **[Claude Cowork](https://docs.anthropic.com/en/docs/claude-cowork)** — Cowork agents can use Mission Control as a tool by reading the workspace's `CLAUDE.md` and JSON data files directly — no special plugin required.
+- **[Claude Cowork](https://docs.anthropic.com/en/docs/claude-cowork)** — Cowork agents can use Agent Mesh as a tool by reading the workspace's `CLAUDE.md` and JSON data files directly — no special plugin required.
 - **Any file-aware agent** — Cursor, Windsurf, or custom scripts can read the JSON data files and call the API endpoints to participate in the agent loop.
 
 ---
@@ -342,7 +342,7 @@ Mission Control runs locally and integrates with AI coding tools through the fil
 
 **Interested in cloud sync?** [Join the waitlist](https://forms.gle/PLACEHOLDER) to get early access when it ships.
 
-See [open issues](https://github.com/MeisnerDan/mission-control/issues) for community-requested features and to vote on what matters most.
+See [open issues](https://github.com/ozkangu/agent-mesh/issues) for community-requested features and to vote on what matters most.
 
 ---
 
@@ -363,7 +363,7 @@ See **[CONTRIBUTING.md](CONTRIBUTING.md)** for detailed guidelines, code convent
 
 This is a personal project I built to organize my own work and shared because others might find it useful. It is provided **as-is** with no warranties, guarantees, or promises of support. Use it at your own risk. See the [LICENSE](LICENSE) file for full terms.
 
-Mission Control is not affiliated with or endorsed by Anthropic. It automates Claude Code (an official Anthropic product) via the `claude -p` CLI — it does not access the Anthropic API directly or use the Agent SDK.
+Agent Mesh is not affiliated with or endorsed by Anthropic. It automates Claude Code (an official Anthropic product) via the `claude -p` CLI — it does not access the Anthropic API directly or use the Agent SDK.
 
 ---
 

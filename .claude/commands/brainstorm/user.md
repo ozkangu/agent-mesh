@@ -2,10 +2,10 @@ Brainstorm ideas about: $ARGUMENTS
 
 ## Setup
 
-1. Read `mission-control/data/ai-context.md` for current state snapshot
-2. Read `mission-control/data/brain-dump.json` to see existing ideas (avoid duplicates)
-3. Read `mission-control/data/projects.json` to understand active projects and their context
-4. Read `mission-control/data/goals.json` to understand strategic priorities
+1. Read `agent-mesh/data/ai-context.md` for current state snapshot
+2. Read `agent-mesh/data/brain-dump.json` to see existing ideas (avoid duplicates)
+3. Read `agent-mesh/data/projects.json` to understand active projects and their context
+4. Read `agent-mesh/data/goals.json` to understand strategic priorities
 
 ## Brainstorming Phase
 
@@ -36,7 +36,7 @@ After presenting all ideas, rank your **top 3 picks** based on the best effort-t
 
 Ask me which ideas I want to keep. For each selected idea:
 
-1. Add it to `mission-control/data/brain-dump.json` with:
+1. Add it to `agent-mesh/data/brain-dump.json` with:
    ```json
    {
      "id": "bd_{Date.now()}",

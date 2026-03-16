@@ -17,7 +17,7 @@ cd "$WORKSPACE_ROOT"
 # ─── Whitelist: only these paths get published ───────────────────────────────
 INCLUDE_PATHS=(
   # App
-  "mission-control"
+  "agent-mesh"
   # Agent infrastructure
   ".claude"
   ".claude-plugin"
@@ -35,45 +35,45 @@ INCLUDE_PATHS=(
 
 # Files to remove AFTER overlay (private assets that live inside included dirs)
 EXCLUDE_FILES=(
-  "mission-control/docs/logo.png"
-  "mission-control/docs/logo.svg"
+  "agent-mesh/docs/logo.png"
+  "agent-mesh/docs/logo.svg"
 )
 
 # Personal data files — restored from public-launch HEAD after overlay (empty schemas)
 PERSONAL_DATA_FILES=(
-  "mission-control/data/tasks.json"
-  "mission-control/data/goals.json"
-  "mission-control/data/projects.json"
-  "mission-control/data/brain-dump.json"
-  "mission-control/data/inbox.json"
-  "mission-control/data/activity-log.json"
-  "mission-control/data/decisions.json"
-  "mission-control/data/missions.json"
-  "mission-control/data/tasks-archive.json"
-  "mission-control/data/respond-runs.json"
+  "agent-mesh/data/tasks.json"
+  "agent-mesh/data/goals.json"
+  "agent-mesh/data/projects.json"
+  "agent-mesh/data/brain-dump.json"
+  "agent-mesh/data/inbox.json"
+  "agent-mesh/data/activity-log.json"
+  "agent-mesh/data/decisions.json"
+  "agent-mesh/data/missions.json"
+  "agent-mesh/data/tasks-archive.json"
+  "agent-mesh/data/respond-runs.json"
 )
 
 # Empty schema for each personal data file (used when file is new to public-launch)
 declare -A EMPTY_SCHEMAS
 EMPTY_SCHEMAS=(
-  ["mission-control/data/tasks.json"]='{ "tasks": [] }'
-  ["mission-control/data/goals.json"]='{ "goals": [] }'
-  ["mission-control/data/projects.json"]='{ "projects": [] }'
-  ["mission-control/data/brain-dump.json"]='{ "entries": [] }'
-  ["mission-control/data/inbox.json"]='{ "messages": [] }'
-  ["mission-control/data/activity-log.json"]='{ "events": [] }'
-  ["mission-control/data/decisions.json"]='{ "decisions": [] }'
-  ["mission-control/data/missions.json"]='{ "missions": [] }'
-  ["mission-control/data/tasks-archive.json"]='{ "tasks": [] }'
-  ["mission-control/data/respond-runs.json"]='{ "runs": [] }'
+  ["agent-mesh/data/tasks.json"]='{ "tasks": [] }'
+  ["agent-mesh/data/goals.json"]='{ "goals": [] }'
+  ["agent-mesh/data/projects.json"]='{ "projects": [] }'
+  ["agent-mesh/data/brain-dump.json"]='{ "entries": [] }'
+  ["agent-mesh/data/inbox.json"]='{ "messages": [] }'
+  ["agent-mesh/data/activity-log.json"]='{ "events": [] }'
+  ["agent-mesh/data/decisions.json"]='{ "decisions": [] }'
+  ["agent-mesh/data/missions.json"]='{ "missions": [] }'
+  ["agent-mesh/data/tasks-archive.json"]='{ "tasks": [] }'
+  ["agent-mesh/data/respond-runs.json"]='{ "runs": [] }'
 )
 
 # Config/template data files that SHOULD sync from main (not personal)
 SAFE_DATA_FILES=(
-  "mission-control/data/agents.json"
-  "mission-control/data/skills-library.json"
-  "mission-control/data/daemon-config.json"
-  "mission-control/data/checkpoints/snap_demo.json"
+  "agent-mesh/data/agents.json"
+  "agent-mesh/data/skills-library.json"
+  "agent-mesh/data/daemon-config.json"
+  "agent-mesh/data/checkpoints/snap_demo.json"
 )
 
 # ─── Preflight checks ────────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ while IFS= read -r f; do
   if [ "$FOUND" = false ]; then
     echo "  ⚠ Unknown data file: $f — add to PERSONAL_DATA_FILES or SAFE_DATA_FILES in sync-public.sh"
   fi
-done < <(git diff --cached --name-only -- mission-control/data/ 2>/dev/null || true)
+done < <(git diff --cached --name-only -- agent-mesh/data/ 2>/dev/null || true)
 
 # Detect files deleted on main but still on public-launch (within whitelisted paths)
 echo "Checking for deleted files..."
